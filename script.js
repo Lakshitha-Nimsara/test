@@ -40,12 +40,17 @@
     'Yes obapan babaaa 😠'  // Specific message for sadcat7.gif
   ];
 
-  /* ─── Preload GIFs in background ─── */
-  (function preloadGifs() {
+  /* ─── Preload GIFs and images in background ─── */
+  (function preloadAssets() {
+    // Preload sad cat GIFs
     SADCAT_GIFS.forEach(function(gifPath) {
       const img = new Image();
       img.src = gifPath;
     });
+    
+    // Preload dance.gif for celebration screen
+    const danceImg = new Image();
+    danceImg.src = 'PNG/dance.gif';
   })();
 
   /* ─── 1. Background Floating Hearts ─── */
@@ -250,6 +255,9 @@
 
       /* Start celebration heart rain */
       startCelebHeartRain();
+      
+      /* Start glowing hearts behind dance gif */
+      startGlowHearts();
 
       /* Bind tap-to-spawn */
       celebScreen.addEventListener('click',  spawnTapHeart);
@@ -384,12 +392,16 @@
   /* ─── 5d. Gift Box Sequence ─── */
   const giftbox = document.getElementById('giftbox');
   const btnNextGift2 = document.getElementById('btnNextGift2');
+  let giftboxReady = false;  // Flag to prevent clicking before fully loaded
   
   function showGiftBox() {
-    giftbox.classList.add('show', 'clickable');
+    giftbox.classList.add('show');
+    giftboxReady = false;  // Block clicks initially
     
-    /* Show message box after gift box fully appears */
+    /* Make clickable only after gift box fully appears */
     setTimeout(function() {
+      giftbox.classList.add('clickable');
+      giftboxReady = true;  // Now allow clicks
       showMessageBox();
     }, 1200);
   }
@@ -411,11 +423,15 @@
   }, { passive: false });
   
   function onGiftBoxClick() {
-    /* Only respond if giftbox is visible and clickable */
-    if (!giftbox.classList.contains('clickable')) return;
+    /* Only respond if giftbox is visible, clickable, AND ready */
+    if (!giftbox.classList.contains('clickable') || !giftboxReady) return;
     
     /* Remove clickable to prevent multiple clicks */
     giftbox.classList.remove('clickable');
+    giftboxReady = false;  // Disable further clicks
+    
+    /* Block all interactions on gift screen during transition */
+    giftScreen.style.pointerEvents = 'none';
     
     /* Jiggle the giftbox */
     giftbox.classList.add('jiggle');
@@ -446,6 +462,7 @@
       setTimeout(function() {
         giftbox.classList.remove('show', 'vanish', 'clickable');
         messageBox.classList.remove('show', 'vanish');
+        giftScreen.style.pointerEvents = 'auto';  // Re-enable interactions
         showEnvelope();
       }, 800);
     }, 500);
@@ -454,12 +471,16 @@
   /* ─── 5f. Envelope Sequence ─── */
   const envelope = document.getElementById('envelope');
   const envelopeMessage = document.getElementById('envelopeMessage');
+  let envelopeReady = false;  // Flag to prevent clicking before fully loaded
   
   function showEnvelope() {
-    envelope.classList.add('show', 'clickable');
+    envelope.classList.add('show');
+    envelopeReady = false;  // Block clicks initially
     
-    /* Show envelope message after envelope fully appears */
+    /* Make clickable only after envelope fully appears */
     setTimeout(function() {
+      envelope.classList.add('clickable');
+      envelopeReady = true;  // Now allow clicks
       envelopeMessage.classList.add('show');
     }, 1200);
   }
@@ -471,11 +492,15 @@
   }, { passive: false });
   
   function onEnvelopeClick() {
-    /* Only respond if envelope is visible and clickable */
-    if (!envelope.classList.contains('clickable')) return;
+    /* Only respond if envelope is visible, clickable, AND ready */
+    if (!envelope.classList.contains('clickable') || !envelopeReady) return;
     
     /* Remove clickable to prevent multiple clicks */
     envelope.classList.remove('clickable');
+    envelopeReady = false;  // Disable further clicks
+    
+    /* Block all interactions on gift screen during transition */
+    giftScreen.style.pointerEvents = 'none';
     
     /* Jiggle animation */
     envelope.classList.add('jiggle');
@@ -490,6 +515,7 @@
       setTimeout(function() {
         envelope.classList.remove('show', 'vanish', 'clickable');
         envelopeMessage.classList.remove('show', 'vanish');
+        giftScreen.style.pointerEvents = 'auto';  // Re-enable interactions
         
         /* Show final message */
         showFinalMessage();
@@ -596,6 +622,53 @@
         if (h.parentNode) h.parentNode.removeChild(h);
       });
     }
+  }
+
+  /* ─── 8. Glowing hearts behind dance gif ─── */
+  function startGlowHearts() {
+    const celebGlowHearts = document.getElementById('celebGlowHearts');
+    const celebDanceContainer = document.getElementById('celebDanceContainer');
+    const glowHeartEmojis = ['💖', '💗', '💓', '💞', '💝'];
+    
+    let running = true;
+
+    (function spawnGlowHeart() {
+      if (!running) return;
+
+      const h = document.createElement('div');
+      h.className = 'glow-heart';
+      h.textContent = glowHeartEmojis[Math.floor(Math.random() * glowHeartEmojis.length)];
+
+      // Get the container size
+      const containerWidth = celebDanceContainer.offsetWidth;
+      const containerHeight = celebDanceContainer.offsetHeight;
+      
+      // Position within the container (center is at containerWidth/2, containerHeight/2)
+      const centerX = containerWidth / 2;
+      const centerY = containerHeight / 2;
+      
+      // Random offset from center (create a circle around the gif)
+      const angle = Math.random() * Math.PI * 2;
+      const distance = 30 + Math.random() * 50; // 30-80px from center (adjusted for container)
+      const x = centerX + Math.cos(angle) * distance;
+      const y = centerY + Math.sin(angle) * distance;
+
+      h.style.left = x + 'px';
+      h.style.top = y + 'px';
+      h.style.fontSize = (1.2 + Math.random() * 1) + 'rem';
+      h.style.animationDuration = (2 + Math.random() * 2) + 's';
+      h.style.animationDelay = (Math.random() * 0.5) + 's';
+
+      celebGlowHearts.appendChild(h);
+
+      /* Remove after animation */
+      h.addEventListener('animationend', function() {
+        if (h.parentNode) h.parentNode.removeChild(h);
+      });
+
+      /* Spawn next glow heart */
+      setTimeout(spawnGlowHeart, 400 + Math.random() * 600);
+    })();
   }
 
 })();
