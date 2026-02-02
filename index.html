@@ -53,6 +53,12 @@
     <div class="gift-container" id="giftContainer">
       <!-- Flower Bouquet -->
       <img src="PNG/Flowerbouque.png" class="gift-item" id="bouquet" alt="Flower Bouquet" />
+      
+      <!-- Bouquet Message (appears near bouquet) -->
+      <div class="bouquet-message" id="bouquetMessage">
+        <p>මේක ඔයාට මගෙන් 😌🌹</p>
+      </div>
+      
       <button class="btn btn--next-gift" id="btnNextGift1" type="button">Next Gift 💝</button>
       
       <!-- Gift Box (clickable) -->
@@ -71,10 +77,15 @@
         <p>Open it! 💌</p>
       </div>
       
-      <!-- Final Message -->
+      <!-- Final Message - Paper Note -->
       <div class="final-message" id="finalMessage">
-        <h2>I LOVE YOU</h2>
-        <p>💕✨💖</p>
+        <div class="paper-note">
+          <div class="paper-lines"></div>
+          <div class="paper-content">
+            <p class="love-text" id="loveText"></p>
+            <p class="signature">Your dear love ❤️</p>
+          </div>
+        </div>
       </div>
     </div>
   </section>

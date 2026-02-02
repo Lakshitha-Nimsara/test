@@ -633,6 +633,35 @@ body {
   text-align: center;
 }
 
+/* Bouquet message - positioned at right side top of bouquet */
+.bouquet-message {
+  position: absolute;
+  right: -165px;
+  top: -20px;
+  transform: scale(0.5);
+  background: linear-gradient(135deg, var(--white) 0%, var(--cream) 100%);
+  border: 3px solid var(--pink-warm);
+  border-radius: 20px;
+  padding: 18px 22px;
+  box-shadow: 0 12px 40px rgba(233, 30, 99, .25);
+  opacity: 0;
+  pointer-events: none;
+  transition: none;
+  white-space: nowrap;
+}
+
+.bouquet-message.show {
+  animation: bouquetMessageAppear .8s cubic-bezier(.34,1.56,.64,1) .4s forwards;
+}
+
+.bouquet-message p {
+  font-size: 1.15rem;
+  font-weight: 600;
+  color: var(--pink-deep);
+  margin: 0;
+  text-align: center;
+}
+
 @keyframes messageBoxAppear {
   0% {
     opacity: 0;
@@ -655,6 +684,17 @@ body {
   }
 }
 
+@keyframes bouquetMessageAppear {
+  0% {
+    opacity: 0;
+    transform: scale(0.5) translateX(20px) translateY(-10px);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1) translateX(0) translateY(0);
+  }
+}
+
 .message-box.jiggle {
   animation: jiggle .5s ease;
 }
@@ -671,6 +711,10 @@ body {
   animation: vanishWithMist .8s ease forwards;
 }
 
+.bouquet-message.vanish {
+  animation: bouquetVanish .5s ease forwards;
+}
+
 @keyframes vanishWithMist {
   0% {
     opacity: 1;
@@ -685,6 +729,17 @@ body {
     opacity: 0;
     transform: translateY(-50%) scale(1.4);
     filter: blur(8px);
+  }
+}
+
+@keyframes bouquetVanish {
+  0% {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(0.8) translateY(-10px);
   }
 }
 
@@ -745,14 +800,15 @@ body {
   }
 }
 
-/* Final Message */
+/* Final Message - Paper Note */
 .final-message {
   position: absolute;
-  text-align: center;
   opacity: 0;
   transform: scale(0.5);
   pointer-events: none;
   z-index: 10;
+  width: 90%;
+  max-width: 450px;
 }
 
 .final-message.show {
@@ -762,45 +818,145 @@ body {
 @keyframes finalMessageAppear {
   0% {
     opacity: 0;
-    transform: scale(0.5) translateY(30px);
+    transform: scale(0.5) translateY(30px) rotate(-5deg);
   }
   60% {
-    transform: scale(1.1) translateY(-5px);
+    transform: scale(1.05) translateY(-5px) rotate(1deg);
   }
   100% {
     opacity: 1;
-    transform: scale(1) translateY(0);
+    transform: scale(1) translateY(0) rotate(0deg);
   }
 }
 
-.final-message h2 {
-  font-family: var(--font-head);
-  font-size: 3rem;
+/* Paper Note Design */
+.paper-note {
+  position: relative;
+  background: linear-gradient(to bottom, #fefefe 0%, #f9f9f9 100%);
+  border-radius: 8px;
+  padding: 40px 35px 35px 35px;
+  box-shadow: 
+    0 2px 5px rgba(0,0,0,.05),
+    0 8px 20px rgba(0,0,0,.08),
+    0 15px 35px rgba(0,0,0,.06),
+    inset 0 1px 0 rgba(255,255,255,.8);
+  border: 1px solid rgba(0,0,0,.08);
+  min-height: 320px;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+}
+
+/* Paper lines effect */
+.paper-lines {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-image: repeating-linear-gradient(
+    transparent,
+    transparent 31px,
+    rgba(233, 30, 99, .08) 31px,
+    rgba(233, 30, 99, .08) 32px
+  );
+  pointer-events: none;
+  border-radius: 8px;
+  opacity: .6;
+}
+
+/* Paper content */
+.paper-content {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  flex: 1;
+}
+
+/* Love text with typewriter effect */
+.love-text {
+  font-family: 'Segoe UI', 'Noto Sans Sinhala', sans-serif;
+  font-size: 1.4rem;
+  line-height: 2;
+  color: #2c3e50;
+  margin: 0;
+  padding: 10px 0;
+  white-space: pre-wrap;
+  word-wrap: break-word;
+  text-align: left;
+  font-weight: 500;
+  letter-spacing: 0.3px;
+}
+
+/* Blinking cursor effect during typing */
+.love-text.typing::after {
+  content: '|';
+  animation: blink .7s infinite;
+  margin-left: 2px;
   color: var(--pink-deep);
-  margin-bottom: 12px;
-  text-shadow: 0 4px 20px rgba(233, 30, 99, .4);
-  animation: loveTextPulse 1.5s ease-in-out infinite;
 }
 
-@keyframes loveTextPulse {
-  0%, 100% { 
-    transform: scale(1); 
-    filter: drop-shadow(0 0 10px rgba(233,30,99,.3));
+@keyframes blink {
+  0%, 50% { opacity: 1; }
+  51%, 100% { opacity: 0; }
+}
+
+/* Signature */
+.signature {
+  font-family: 'Brush Script MT', cursive, 'Segoe UI', sans-serif;
+  font-size: 1.3rem;
+  color: var(--pink-deep);
+  text-align: right;
+  margin: 20px 0 0 0;
+  font-style: italic;
+  font-weight: 600;
+  opacity: 0;
+  transform: translateX(20px);
+}
+
+.signature.show {
+  animation: signatureAppear .8s cubic-bezier(.34,1.56,.64,1) forwards;
+}
+
+@keyframes signatureAppear {
+  0% {
+    opacity: 0;
+    transform: translateX(20px);
   }
-  50% { 
-    transform: scale(1.08); 
-    filter: drop-shadow(0 0 25px rgba(233,30,99,.6));
+  100% {
+    opacity: 1;
+    transform: translateX(0);
   }
 }
 
-.final-message p {
-  font-size: 2rem;
-  animation: sparkleRotate 3s linear infinite;
+/* Paper fold effect (top right corner) */
+.paper-note::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 0;
+  height: 0;
+  border-style: solid;
+  border-width: 0 40px 40px 0;
+  border-color: transparent #e8e8e8 transparent transparent;
+  border-radius: 0 8px 0 0;
+  filter: drop-shadow(-2px 2px 3px rgba(0,0,0,.1));
 }
 
-@keyframes sparkleRotate {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
+.paper-note::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 0;
+  height: 0;
+  border-style: solid;
+  border-width: 0 40px 40px 0;
+  border-color: transparent white transparent transparent;
+  border-radius: 0 8px 0 0;
 }
 
 /* Mobile optimizations */
@@ -810,12 +966,24 @@ body {
     width: 70vw;
   }
   
-  .final-message h2 {
-    font-size: 2.2rem;
+  .final-message {
+    width: 92%;
+    max-width: 380px;
   }
   
-  .final-message p {
-    font-size: 1.6rem;
+  .paper-note {
+    padding: 30px 25px 25px 25px;
+    min-height: 280px;
+  }
+  
+  .love-text {
+    font-size: 1.15rem;
+    line-height: 1.9;
+  }
+  
+  .signature {
+    font-size: 1.1rem;
+    margin-top: 15px;
   }
   
   /* Message boxes on mobile - positioned at bottom */
@@ -848,8 +1016,24 @@ body {
     animation: messageBoxAppearMobile .8s cubic-bezier(.34,1.56,.64,1) forwards;
   }
   
+  .bouquet-message {
+    left: 50%;
+    right: auto;
+    top: auto;
+    bottom: -210px;
+    transform: translateX(-50%) scale(0.5);
+    padding: 14px 18px;
+    max-width: 85vw;
+    white-space: normal;
+  }
+  
+  .bouquet-message.show {
+    animation: bouquetMessageAppearMobile .8s cubic-bezier(.34,1.56,.64,1) .4s forwards;
+  }
+  
   .message-box p,
-  .envelope-message p {
+  .envelope-message p,
+  .bouquet-message p {
     font-size: 1rem;
   }
   
@@ -917,6 +1101,24 @@ body {
     width: 68vw;
   }
   
+  .final-message {
+    width: 95%;
+  }
+  
+  .paper-note {
+    padding: 25px 20px 20px 20px;
+    min-height: 260px;
+  }
+  
+  .love-text {
+    font-size: 1.05rem;
+    line-height: 1.8;
+  }
+  
+  .signature {
+    font-size: 1rem;
+  }
+  
   .message-box,
   .envelope-message {
     bottom: -170px;
@@ -924,8 +1126,15 @@ body {
     max-width: 90vw;
   }
   
+  .bouquet-message {
+    bottom: -220px;
+    padding: 12px 16px;
+    max-width: 90vw;
+  }
+  
   .message-box p,
-  .envelope-message p {
+  .envelope-message p,
+  .bouquet-message p {
     font-size: 0.92rem;
   }
   
@@ -933,14 +1142,6 @@ body {
     bottom: -200px;
     font-size: 0.9rem;
     padding: 9px 20px;
-  }
-  
-  .final-message h2 {
-    font-size: 2rem;
-  }
-  
-  .final-message p {
-    font-size: 1.4rem;
   }
   
   .card__title {
@@ -966,14 +1167,31 @@ body {
     max-width: 180px;
   }
   
+  .paper-note {
+    padding: 20px 18px 18px 18px;
+    min-height: 220px;
+  }
+  
+  .love-text {
+    font-size: 1rem;
+    line-height: 1.7;
+  }
+  
+  .signature {
+    font-size: 0.95rem;
+    margin-top: 10px;
+  }
+  
   .message-box,
-  .envelope-message {
+  .envelope-message,
+  .bouquet-message {
     bottom: -120px;
     padding: 10px 14px;
   }
   
   .message-box p,
-  .envelope-message p {
+  .envelope-message p,
+  .bouquet-message p {
     font-size: 0.9rem;
   }
   
@@ -981,14 +1199,6 @@ body {
     bottom: -140px;
     font-size: 0.9rem;
     padding: 8px 18px;
-  }
-  
-  .final-message h2 {
-    font-size: 1.8rem;
-  }
-  
-  .final-message p {
-    font-size: 1.3rem;
   }
   
   .celeb__big-heart {
@@ -1014,8 +1224,20 @@ body {
     max-width: 320px;
   }
   
-  .final-message h2 {
-    font-size: 3.5rem;
+  .final-message {
+    max-width: 500px;
+  }
+  
+  .paper-note {
+    min-height: 350px;
+  }
+  
+  .love-text {
+    font-size: 1.5rem;
+  }
+  
+  .signature {
+    font-size: 1.4rem;
   }
   
   .card {
@@ -1024,6 +1246,17 @@ body {
 }
 
 @keyframes messageBoxAppearMobile {
+  0% {
+    opacity: 0;
+    transform: translateX(-50%) scale(0.5) translateY(20px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateX(-50%) scale(1) translateY(0);
+  }
+}
+
+@keyframes bouquetMessageAppearMobile {
   0% {
     opacity: 0;
     transform: translateX(-50%) scale(0.5) translateY(20px);

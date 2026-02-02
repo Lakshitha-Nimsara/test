@@ -329,10 +329,16 @@
   
   /* ─── 5c. Bouquet Sequence ─── */
   const bouquet = document.getElementById('bouquet');
+  const bouquetMessage = document.getElementById('bouquetMessage');
   const btnNextGift1 = document.getElementById('btnNextGift1');
   
   function showBouquet() {
     bouquet.classList.add('show');
+    
+    /* Show bouquet message after bouquet appears */
+    setTimeout(function() {
+      bouquetMessage.classList.add('show');
+    }, 800);
     
     /* Show next button after bouquet fully appears */
     setTimeout(function() {
@@ -347,15 +353,17 @@
   }, { passive: false });
   
   function onNextGift1Click() {
-    /* Hide bouquet and button */
+    /* Hide bouquet, message and button */
     bouquet.style.transition = 'opacity .5s ease, transform .5s ease';
     bouquet.style.opacity = '0';
     bouquet.style.transform = 'scale(0.8)';
     btnNextGift1.style.opacity = '0';
+    bouquetMessage.classList.add('vanish');
     
     setTimeout(function() {
       bouquet.classList.remove('show');
       btnNextGift1.classList.remove('show');
+      bouquetMessage.classList.remove('show', 'vanish');
       bouquet.style.opacity = '';
       bouquet.style.transform = '';
       btnNextGift1.style.opacity = '';
@@ -481,11 +489,45 @@
     }, 500);
   }
   
-  /* ─── 5g. Final Message ─── */
+  /* ─── 5g. Final Message with Typewriter Effect ─── */
   const finalMessage = document.getElementById('finalMessage');
+  const loveText = document.getElementById('loveText');
   
   function showFinalMessage() {
     finalMessage.classList.add('show');
+    
+    /* Start typewriter effect after note appears */
+    setTimeout(function() {
+      typewriterEffect();
+    }, 800);
+  }
+  
+  function typewriterEffect() {
+    const text = "මං ඔයාට ගොදාආආආආආආආක්\nආදලෙයි 😚❤️\n\nඋම්ම්ම්ම්ම්ම්ම්ම්ම්ම්ම්ම්ම්ම්ම්ම්ම්මා ❤️";
+    let index = 0;
+    
+    /* Add typing class to show cursor */
+    loveText.classList.add('typing');
+    
+    /* Typewriter interval */
+    const typingInterval = setInterval(function() {
+      if (index < text.length) {
+        loveText.textContent += text.charAt(index);
+        index++;
+      } else {
+        /* Typing complete */
+        clearInterval(typingInterval);
+        loveText.classList.remove('typing');
+        
+        /* Show signature after typing is complete */
+        setTimeout(function() {
+          const signature = document.querySelector('.signature');
+          if (signature) {
+            signature.classList.add('show');
+          }
+        }, 500);
+      }
+    }, 80); /* Speed: 80ms per character - adjust for faster/slower typing */
   }
 
   /* ─── 6. Celebration heart rain (continuous) ─── */
