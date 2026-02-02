@@ -245,7 +245,7 @@ body {
   gap: 12px;
 }
 .sadcat-portal.visible {
-  opacity: .9;
+  opacity: 1;
 }
 .sadcat-portal__img {
   width: 120px;

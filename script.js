@@ -34,8 +34,8 @@
     'Ane baba 🥺',
     'Please say yes',
     'bbyyyyyy🥹',
-    'please baba',
-    'Mn tharahai',
+    'Yes ඔබන්න 😪',
+    'මං තරහයි 🥺',
     'Ane baba 🥺',
     'Yes obapan babaaa 😠'  // Specific message for sadcat7.gif
   ];
