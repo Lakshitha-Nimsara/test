@@ -1019,8 +1019,8 @@ body {
   /* Bouquet message on mobile - positioned near bouquet right side top */
   .bouquet-message {
     left: auto;
-    right: -15px;
-    top: -10px;
+    right: 5px;
+    top: 20px;
     bottom: auto;
     transform: scale(0.5);
     padding: 12px 16px;
@@ -1128,8 +1128,8 @@ body {
   }
   
   .bouquet-message {
-    right: -10px;
-    top: -5px;
+    right: 8px;
+    top: 25px;
     padding: 10px 14px;
     max-width: 130px;
   }
@@ -1191,8 +1191,8 @@ body {
   }
   
   .bouquet-message {
-    right: -12px;
-    top: -8px;
+    right: 3px;
+    top: 15px;
     padding: 9px 12px;
     max-width: 120px;
   }
