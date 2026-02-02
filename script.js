@@ -40,6 +40,14 @@
     'Yes obapan babaaa 😠'  // Specific message for sadcat7.gif
   ];
 
+  /* ─── Preload GIFs in background ─── */
+  (function preloadGifs() {
+    SADCAT_GIFS.forEach(function(gifPath) {
+      const img = new Image();
+      img.src = gifPath;
+    });
+  })();
+
   /* ─── 1. Background Floating Hearts ─── */
   (function initFloatingHearts() {
     const count = 16;
