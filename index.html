@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
+  <meta name="theme-color" content="#fdf2f8" />
+  <title>💖 Be My Valentine?</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+
+  <!-- Floating hearts background layer -->
+  <div class="hearts-bg" id="heartsBg" aria-hidden="true"></div>
+
+  <!-- Ambient particle layer -->
+  <div class="particles" id="particles" aria-hidden="true"></div>
+
+  <!-- Main card -->
+  <main class="card" id="mainCard">
+    <div class="card__deco card__deco--tl"></div>
+    <div class="card__deco card__deco--br"></div>
+
+    <div class="card__heart-icon" aria-hidden="true">💖</div>
+    <h1 class="card__title" id="questionText">Will you be my Valentine?</h1>
+    <p class="card__sub">💖</p>
+
+    <div class="card__buttons" id="buttonWrap">
+      <button class="btn btn--yes" id="btnYes" type="button">YES 💕</button>
+      <button class="btn btn--no"  id="btnNo"  type="button">NO 💔</button>
+    </div>
+  </main>
+
+  <!-- Sad cat gif portal (hidden by default, img injected by JS) -->
+  <div class="sadcat-portal" id="sadcatPortal" aria-hidden="true"></div>
+
+  <!-- YES celebration screen (hidden by default) -->
+  <section class="celeb" id="celebScreen" aria-hidden="true">
+    <div class="celeb__hearts" id="celebHearts" aria-hidden="true"></div>
+    <div class="celeb__content">
+      <div class="celeb__big-heart" id="celebBigHeart" aria-hidden="true">💖</div>
+      <h2 class="celeb__title" id="celebTitle">Yaaay 💕</h2>
+      <p  class="celeb__msg"  id="celebMsg" >I knew you'd say yes!</p>
+    </div>
+    <p class="celeb__tap">Tap anywhere to spawn hearts ✨</p>
+  </section>
+
+  <script src="script.js"></script>
+</body>
+</html>
