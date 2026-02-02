@@ -42,15 +42,29 @@
 
   /* ─── Preload GIFs and images in background ─── */
   (function preloadAssets() {
-    // Preload sad cat GIFs
+    // Preload sad cat GIFs - force load into cache
     SADCAT_GIFS.forEach(function(gifPath) {
       const img = new Image();
       img.src = gifPath;
+      // Force browser to actually load the image
+      img.onload = function() {
+        // Image is now cached
+      };
     });
     
     // Preload dance.gif for celebration screen
     const danceImg = new Image();
     danceImg.src = 'PNG/dance.gif';
+    
+    // Preload gift images
+    const bouquetImg = new Image();
+    bouquetImg.src = 'PNG/Flowerbouque.png';
+    
+    const giftboxImg = new Image();
+    giftboxImg.src = 'PNG/giftbox.png';
+    
+    const envelopeImg = new Image();
+    envelopeImg.src = 'PNG/envelope.png';
   })();
 
   /* ─── 1. Background Floating Hearts ─── */
@@ -163,7 +177,7 @@
   var sadcatFadeTimer = null;   // holds the pending fadeout timeout
 
   function showSadCat() {
-    /* Kill any previous fadeout timer immediately */
+    /* Kill any previous fadeout timer immediately - ensures fresh 4 second timer */
     if (sadcatFadeTimer !== null) {
       clearTimeout(sadcatFadeTimer);
       sadcatFadeTimer = null;
@@ -206,24 +220,32 @@
     textEl.className = 'sadcat-text';
     textEl.textContent = text;
 
+    /* Function to start the 4-second timer for THIS specific gif */
+    function startFadeTimer() {
+      /* Clear any existing timer first */
+      if (sadcatFadeTimer !== null) {
+        clearTimeout(sadcatFadeTimer);
+      }
+      
+      /* Start fresh 4-second timer for this gif */
+      sadcatFadeTimer = setTimeout(function () {
+        sadcatPortal.classList.remove('visible');
+        sadcatFadeTimer = null;
+      }, 4000);
+    }
+
     /* Only fade in once the image is actually loaded */
     newImg.onload = function () {
       sadcatPortal.classList.add('visible');
-
-      /* Fade out after 4 s */
-      sadcatFadeTimer = setTimeout(function () {
-        sadcatPortal.classList.remove('visible');
-        sadcatFadeTimer = null;
-      }, 4000);
+      /* Start fresh 4-second timer */
+      startFadeTimer();
     };
 
-    /* If load fails for any reason, still show after 300ms */
+    /* If load fails for any reason, still show and start timer */
     newImg.onerror = function () {
       sadcatPortal.classList.add('visible');
-      sadcatFadeTimer = setTimeout(function () {
-        sadcatPortal.classList.remove('visible');
-        sadcatFadeTimer = null;
-      }, 4000);
+      /* Start fresh 4-second timer */
+      startFadeTimer();
     };
 
     sadcatPortal.appendChild(newImg);

@@ -1083,7 +1083,7 @@ body {
   .bouquet-message {
     left: auto;
     right: 5px;
-    top: -155px;
+    top: -125px;
     bottom: auto;
     transform: scale(0.5);
     padding: 12px 16px;
@@ -1198,7 +1198,7 @@ body {
   
   .bouquet-message {
     right: 8px;
-    top: -140px;
+    top: -110px;
     padding: 10px 14px;
     max-width: 130px;
   }
@@ -1267,7 +1267,7 @@ body {
   
   .bouquet-message {
     right: 3px;
-    top: -100px;
+    top: -70px;
     padding: 9px 12px;
     max-width: 120px;
   }
