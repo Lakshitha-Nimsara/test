@@ -600,7 +600,7 @@
     const x = (e.clientX || e.pageX) - rect.left;
     const y = (e.clientY || e.pageY) - rect.top;
 
-    const count = 3 + Math.floor(Math.random() * 4);  // 3-6 hearts per tap
+    const count = 1;  // Only 1 heart per tap
 
     for (let i = 0; i < count; i++) {
       const h = document.createElement('div');
@@ -608,8 +608,8 @@
       h.textContent = HEART_EMOJIS[Math.floor(Math.random() * HEART_EMOJIS.length)];
 
       /* Slight spread */
-      const sx = x + (Math.random() - .5) * 60;
-      const sy = y + (Math.random() - .5) * 40;
+      const sx = x + (Math.random() - .5) * 20;
+      const sy = y + (Math.random() - .5) * 20;
 
       h.style.left  = sx + 'px';
       h.style.top   = sy + 'px';
@@ -631,43 +631,50 @@
     const glowHeartEmojis = ['💖', '💗', '💓', '💞', '💝'];
     
     let running = true;
+    let activeHearts = 0;  // Track number of active hearts
+    const MAX_HEARTS = 5;  // Maximum hearts at once
 
     (function spawnGlowHeart() {
       if (!running) return;
 
-      const h = document.createElement('div');
-      h.className = 'glow-heart';
-      h.textContent = glowHeartEmojis[Math.floor(Math.random() * glowHeartEmojis.length)];
+      // Only spawn if we haven't reached the maximum
+      if (activeHearts < MAX_HEARTS) {
+        const h = document.createElement('div');
+        h.className = 'glow-heart';
+        h.textContent = glowHeartEmojis[Math.floor(Math.random() * glowHeartEmojis.length)];
 
-      // Get the container size
-      const containerWidth = celebDanceContainer.offsetWidth;
-      const containerHeight = celebDanceContainer.offsetHeight;
-      
-      // Position within the container (center is at containerWidth/2, containerHeight/2)
-      const centerX = containerWidth / 2;
-      const centerY = containerHeight / 2;
-      
-      // Random offset from center (create a circle around the gif)
-      const angle = Math.random() * Math.PI * 2;
-      const distance = 30 + Math.random() * 50; // 30-80px from center (adjusted for container)
-      const x = centerX + Math.cos(angle) * distance;
-      const y = centerY + Math.sin(angle) * distance;
+        // Get the container size
+        const containerWidth = celebDanceContainer.offsetWidth;
+        const containerHeight = celebDanceContainer.offsetHeight;
+        
+        // Position within the container (center is at containerWidth/2, containerHeight/2)
+        const centerX = containerWidth / 2;
+        const centerY = containerHeight / 2;
+        
+        // Random offset from center (create a circle around the gif)
+        const angle = Math.random() * Math.PI * 2;
+        const distance = 30 + Math.random() * 50; // 30-80px from center (adjusted for container)
+        const x = centerX + Math.cos(angle) * distance;
+        const y = centerY + Math.sin(angle) * distance;
 
-      h.style.left = x + 'px';
-      h.style.top = y + 'px';
-      h.style.fontSize = (1.2 + Math.random() * 1) + 'rem';
-      h.style.animationDuration = (2 + Math.random() * 2) + 's';
-      h.style.animationDelay = (Math.random() * 0.5) + 's';
+        h.style.left = x + 'px';
+        h.style.top = y + 'px';
+        h.style.fontSize = (1.2 + Math.random() * 1) + 'rem';
+        h.style.animationDuration = (3 + Math.random() * 1) + 's';  // 3-4s duration
+        h.style.animationDelay = (Math.random() * 0.3) + 's';
 
-      celebGlowHearts.appendChild(h);
+        celebGlowHearts.appendChild(h);
+        activeHearts++;  // Increment counter
 
-      /* Remove after animation */
-      h.addEventListener('animationend', function() {
-        if (h.parentNode) h.parentNode.removeChild(h);
-      });
+        /* Remove after animation and decrement counter */
+        h.addEventListener('animationend', function() {
+          if (h.parentNode) h.parentNode.removeChild(h);
+          activeHearts--;  // Decrement when removed
+        });
+      }
 
-      /* Spawn next glow heart */
-      setTimeout(spawnGlowHeart, 400 + Math.random() * 600);
+      /* Spawn next glow heart - slower rate to prevent lag */
+      setTimeout(spawnGlowHeart, 600 + Math.random() * 800);  // 600-1400ms between spawns
     })();
   }
 
