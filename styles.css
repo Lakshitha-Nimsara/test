@@ -35,6 +35,7 @@ html, body {
   height: 100%;
   overflow: hidden;                 /* prevent scroll on button jump */
   touch-action: manipulation;       /* faster taps on mobile */
+  -webkit-overflow-scrolling: touch; /* smooth scrolling on iOS */
 }
 
 body {
@@ -52,6 +53,8 @@ body {
   justify-content: center;
   position: relative;
   overflow: hidden;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
 /* ─── Floating Hearts Background ─── */
@@ -203,6 +206,8 @@ body {
   transition: transform .18s cubic-bezier(.34,1.56,.64,1),
               box-shadow .18s ease;
   will-change: transform;
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
 }
 
 /* YES */
@@ -402,4 +407,629 @@ body {
   position: absolute;
   width: 1px; height: 1px;
   overflow: hidden; clip: rect(0,0,0,0);
+}
+
+/* ─── Gift Button in Celebration Screen ─── */
+.btn--gift {
+  margin-top: 32px;
+  background: linear-gradient(135deg, #ff6b9d 0%, #c44569 100%);
+  color: var(--white);
+  font-size: 1.15rem;
+  padding: 14px 28px;
+  box-shadow: 0 6px 24px rgba(196, 69, 105, .4);
+  animation: giftBtnPulse 2s ease-in-out infinite;
+}
+
+.btn--gift:active,
+.btn--gift:hover {
+  transform: scale(1.1);
+  box-shadow: 0 8px 32px rgba(196, 69, 105, .6);
+}
+
+@keyframes giftBtnPulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.05); }
+}
+
+/* ─── Gift Sequence Screen ─── */
+.gift-screen {
+  position: fixed;
+  inset: 0;
+  z-index: 200;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(160deg, var(--pink-soft) 0%, var(--lavender) 50%, var(--pink-mid) 100%);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity .6s ease;
+  overflow: hidden;
+  touch-action: manipulation;
+}
+
+.gift-screen.visible {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+/* Background animations layer */
+.gift-bg-animations {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+/* Floating particles for gift screen */
+.gift-particle {
+  position: absolute;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  animation: floatParticle linear infinite;
+  will-change: transform, opacity;
+}
+
+@keyframes floatParticle {
+  0% { 
+    transform: translate(0, 0) scale(1); 
+    opacity: 0;
+  }
+  10% { opacity: .6; }
+  50% { 
+    transform: translate(var(--tx), var(--ty)) scale(1.5); 
+    opacity: .4;
+  }
+  100% { 
+    transform: translate(calc(var(--tx) * 2), calc(var(--ty) * 2)) scale(.5); 
+    opacity: 0;
+  }
+}
+
+/* Gift container */
+.gift-container {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  max-width: 400px;
+  padding: 20px;
+}
+
+/* Gift items (images) */
+.gift-item {
+  position: absolute;
+  max-width: 280px;
+  width: 80vw;
+  height: auto;
+  opacity: 0;
+  transform: scale(0.3);
+  pointer-events: none;
+  transition: none;
+  filter: drop-shadow(0 10px 30px rgba(233, 30, 99, .3));
+  -webkit-tap-highlight-color: transparent;
+}
+
+.gift-item.show {
+  animation: giftAppear 1.2s cubic-bezier(.34,1.56,.64,1) forwards;
+  pointer-events: auto;
+}
+
+.gift-item.clickable {
+  cursor: pointer;
+  transition: transform .2s ease;
+}
+
+.gift-item.clickable:hover {
+  transform: scale(1.05);
+}
+
+.gift-item.clickable:active {
+  transform: scale(0.98);
+}
+
+@keyframes giftAppear {
+  0% {
+    opacity: 0;
+    transform: scale(0.3) rotate(-15deg);
+  }
+  60% {
+    opacity: .8;
+    transform: scale(1.05) rotate(2deg);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1) rotate(0deg);
+  }
+}
+
+/* Next gift buttons */
+.btn--next-gift {
+  position: absolute;
+  bottom: -170px;
+  background: linear-gradient(135deg, var(--rose) 0%, var(--pink-deep) 100%);
+  color: var(--white);
+  font-size: 1.1rem;
+  padding: 12px 26px;
+  box-shadow: 0 6px 24px rgba(233, 30, 99, .4);
+  opacity: 0;
+  pointer-events: none;
+  transform: translateY(20px);
+  transition: opacity .5s ease .8s, transform .5s ease .8s;
+}
+
+.btn--next-gift.show {
+  opacity: 1;
+  pointer-events: auto;
+  transform: translateY(0);
+}
+
+.btn--next-gift:active,
+.btn--next-gift:hover {
+  transform: scale(1.08) translateY(0);
+  box-shadow: 0 8px 32px rgba(233, 30, 99, .6);
+}
+
+/* Message Box - positioned to left of giftbox, a bit closer */
+.message-box {
+  position: absolute;
+  left: -145px;
+  top: 50%;
+  transform: translateY(-50%) scale(0.5);
+  background: linear-gradient(135deg, var(--white) 0%, var(--cream) 100%);
+  border: 3px solid var(--pink-warm);
+  border-radius: 20px;
+  padding: 18px 22px;
+  box-shadow: 0 12px 40px rgba(233, 30, 99, .25);
+  opacity: 0;
+  pointer-events: none;
+  transition: none;
+  white-space: nowrap;
+}
+
+.message-box.show {
+  animation: messageBoxAppear .8s cubic-bezier(.34,1.56,.64,1) forwards;
+  pointer-events: auto;
+  cursor: default;
+}
+
+.message-box p {
+  font-size: 1.15rem;
+  font-weight: 600;
+  color: var(--pink-deep);
+  margin: 0;
+  text-align: center;
+}
+
+/* Envelope instruction message - positioned to right of envelope, a bit closer */
+.envelope-message {
+  position: absolute;
+  right: -155px;
+  top: 50%;
+  transform: translateY(-50%) scale(0.5);
+  background: linear-gradient(135deg, var(--white) 0%, var(--cream) 100%);
+  border: 3px solid var(--rose-light);
+  border-radius: 20px;
+  padding: 18px 22px;
+  box-shadow: 0 12px 40px rgba(233, 30, 99, .25);
+  opacity: 0;
+  pointer-events: none;
+  transition: none;
+  white-space: nowrap;
+}
+
+.envelope-message.show {
+  animation: envelopeMessageAppear .8s cubic-bezier(.34,1.56,.64,1) forwards;
+}
+
+.envelope-message p {
+  font-size: 1.15rem;
+  font-weight: 600;
+  color: var(--rose);
+  margin: 0;
+  text-align: center;
+}
+
+@keyframes messageBoxAppear {
+  0% {
+    opacity: 0;
+    transform: translateY(-50%) scale(0.5) translateX(-20px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(-50%) scale(1) translateX(0);
+  }
+}
+
+@keyframes envelopeMessageAppear {
+  0% {
+    opacity: 0;
+    transform: translateY(-50%) scale(0.5) translateX(20px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(-50%) scale(1) translateX(0);
+  }
+}
+
+.message-box.jiggle {
+  animation: jiggle .5s ease;
+}
+
+@keyframes jiggle {
+  0%, 100% { transform: translateY(-50%) rotate(0deg) scale(1); }
+  25% { transform: translateY(-50%) rotate(-8deg) scale(1.05); }
+  50% { transform: translateY(-50%) rotate(8deg) scale(1.05); }
+  75% { transform: translateY(-50%) rotate(-8deg) scale(1.05); }
+}
+
+.message-box.vanish,
+.envelope-message.vanish {
+  animation: vanishWithMist .8s ease forwards;
+}
+
+@keyframes vanishWithMist {
+  0% {
+    opacity: 1;
+    transform: translateY(-50%) scale(1);
+  }
+  50% {
+    opacity: .5;
+    transform: translateY(-50%) scale(1.2);
+    filter: blur(3px);
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(-50%) scale(1.4);
+    filter: blur(8px);
+  }
+}
+
+/* Pink mist effect */
+.pink-mist {
+  position: absolute;
+  width: 200px;
+  height: 200px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(233, 30, 99, .6) 0%, rgba(255, 105, 180, .3) 40%, transparent 70%);
+  opacity: 0;
+  animation: mistExpand 1s ease-out forwards;
+  pointer-events: none;
+  z-index: 5;
+}
+
+@keyframes mistExpand {
+  0% {
+    opacity: 0;
+    transform: scale(0.3);
+  }
+  40% {
+    opacity: .8;
+    transform: scale(1.2);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(2.5);
+    filter: blur(20px);
+  }
+}
+
+/* Envelope jiggle and vanish */
+.gift-item.jiggle {
+  animation: envelopeJiggle .5s ease;
+}
+
+@keyframes envelopeJiggle {
+  0%, 100% { transform: rotate(0deg) scale(1); }
+  25% { transform: rotate(-5deg) scale(1.03); }
+  50% { transform: rotate(5deg) scale(1.03); }
+  75% { transform: rotate(-5deg) scale(1.03); }
+}
+
+.gift-item.vanish {
+  animation: envelopeVanish .6s ease forwards;
+}
+
+@keyframes envelopeVanish {
+  0% {
+    opacity: 1;
+    transform: scale(1) rotate(0deg);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(0.3) rotate(15deg);
+    filter: blur(5px);
+  }
+}
+
+/* Final Message */
+.final-message {
+  position: absolute;
+  text-align: center;
+  opacity: 0;
+  transform: scale(0.5);
+  pointer-events: none;
+  z-index: 10;
+}
+
+.final-message.show {
+  animation: finalMessageAppear 1s cubic-bezier(.34,1.56,.64,1) forwards;
+}
+
+@keyframes finalMessageAppear {
+  0% {
+    opacity: 0;
+    transform: scale(0.5) translateY(30px);
+  }
+  60% {
+    transform: scale(1.1) translateY(-5px);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+.final-message h2 {
+  font-family: var(--font-head);
+  font-size: 3rem;
+  color: var(--pink-deep);
+  margin-bottom: 12px;
+  text-shadow: 0 4px 20px rgba(233, 30, 99, .4);
+  animation: loveTextPulse 1.5s ease-in-out infinite;
+}
+
+@keyframes loveTextPulse {
+  0%, 100% { 
+    transform: scale(1); 
+    filter: drop-shadow(0 0 10px rgba(233,30,99,.3));
+  }
+  50% { 
+    transform: scale(1.08); 
+    filter: drop-shadow(0 0 25px rgba(233,30,99,.6));
+  }
+}
+
+.final-message p {
+  font-size: 2rem;
+  animation: sparkleRotate 3s linear infinite;
+}
+
+@keyframes sparkleRotate {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* Mobile optimizations */
+@media (max-width: 480px) {
+  .gift-item {
+    max-width: 220px;
+    width: 70vw;
+  }
+  
+  .final-message h2 {
+    font-size: 2.2rem;
+  }
+  
+  .final-message p {
+    font-size: 1.6rem;
+  }
+  
+  /* Message boxes on mobile - positioned at bottom */
+  .message-box {
+    left: 50%;
+    top: auto;
+    bottom: -160px;
+    transform: translateX(-50%) scale(0.5);
+    padding: 14px 18px;
+    max-width: 85vw;
+    white-space: normal;
+  }
+  
+  .message-box.show {
+    animation: messageBoxAppearMobile .8s cubic-bezier(.34,1.56,.64,1) forwards;
+  }
+  
+  .envelope-message {
+    left: 50%;
+    right: auto;
+    top: auto;
+    bottom: -160px;
+    transform: translateX(-50%) scale(0.5);
+    padding: 14px 18px;
+    max-width: 85vw;
+    white-space: normal;
+  }
+  
+  .envelope-message.show {
+    animation: messageBoxAppearMobile .8s cubic-bezier(.34,1.56,.64,1) forwards;
+  }
+  
+  .message-box p,
+  .envelope-message p {
+    font-size: 1rem;
+  }
+  
+  .btn--next-gift {
+    bottom: -190px;
+    font-size: 0.95rem;
+    padding: 10px 22px;
+    min-width: 100px;
+  }
+  
+  .btn--gift {
+    font-size: 1rem;
+    padding: 11px 22px;
+    margin-top: 24px;
+    min-width: 100px;
+  }
+  
+  /* Adjust card title for mobile */
+  .card__title {
+    font-size: 1.4rem;
+  }
+  
+  /* Adjust celebration screen elements for mobile */
+  .celeb__big-heart {
+    font-size: 3.8rem;
+  }
+  
+  .celeb__title {
+    font-size: 1.9rem;
+  }
+  
+  .celeb__msg {
+    font-size: 1.05rem;
+    max-width: 240px;
+  }
+  
+  .celeb__tap {
+    font-size: 0.75rem;
+    bottom: 30px;
+  }
+  
+  /* Gift container padding with safe area */
+  .gift-container {
+    padding: 15px;
+    padding-bottom: env(safe-area-inset-bottom, 15px);
+  }
+  
+  /* Adjust card padding for mobile */
+  .card {
+    padding: 36px 24px 34px;
+    width: 92%;
+    max-width: 350px;
+  }
+  
+  /* Ensure buttons are touch-friendly */
+  .btn {
+    min-height: 44px;
+  }
+}
+
+/* Extra small mobile devices */
+@media (max-width: 360px) {
+  .gift-item {
+    max-width: 200px;
+    width: 68vw;
+  }
+  
+  .message-box,
+  .envelope-message {
+    bottom: -170px;
+    padding: 12px 16px;
+    max-width: 90vw;
+  }
+  
+  .message-box p,
+  .envelope-message p {
+    font-size: 0.92rem;
+  }
+  
+  .btn--next-gift {
+    bottom: -200px;
+    font-size: 0.9rem;
+    padding: 9px 20px;
+  }
+  
+  .final-message h2 {
+    font-size: 2rem;
+  }
+  
+  .final-message p {
+    font-size: 1.4rem;
+  }
+  
+  .card__title {
+    font-size: 1.3rem;
+  }
+  
+  .celeb__big-heart {
+    font-size: 3.5rem;
+  }
+  
+  .celeb__title {
+    font-size: 1.8rem;
+  }
+  
+  .card {
+    width: 95%;
+  }
+}
+
+/* Landscape mobile orientation */
+@media (max-width: 850px) and (max-height: 500px) {
+  .gift-item {
+    max-width: 180px;
+  }
+  
+  .message-box,
+  .envelope-message {
+    bottom: -120px;
+    padding: 10px 14px;
+  }
+  
+  .message-box p,
+  .envelope-message p {
+    font-size: 0.9rem;
+  }
+  
+  .btn--next-gift {
+    bottom: -140px;
+    font-size: 0.9rem;
+    padding: 8px 18px;
+  }
+  
+  .final-message h2 {
+    font-size: 1.8rem;
+  }
+  
+  .final-message p {
+    font-size: 1.3rem;
+  }
+  
+  .celeb__big-heart {
+    font-size: 3rem;
+  }
+  
+  .celeb__title {
+    font-size: 1.6rem;
+  }
+  
+  .celeb__msg {
+    font-size: 0.95rem;
+  }
+  
+  .card {
+    padding: 28px 20px 26px;
+  }
+}
+
+/* Very large screens - limit max sizes */
+@media (min-width: 1200px) {
+  .gift-item {
+    max-width: 320px;
+  }
+  
+  .final-message h2 {
+    font-size: 3.5rem;
+  }
+  
+  .card {
+    max-width: 420px;
+  }
+}
+
+@keyframes messageBoxAppearMobile {
+  0% {
+    opacity: 0;
+    transform: translateX(-50%) scale(0.5) translateY(20px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateX(-50%) scale(1) translateY(0);
+  }
 }

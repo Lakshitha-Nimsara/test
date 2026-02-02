@@ -2,8 +2,10 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
   <meta name="theme-color" content="#fdf2f8" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="default" />
   <title>💖 Be My Valentine?</title>
   <link rel="stylesheet" href="styles.css" />
 </head>
@@ -40,8 +42,41 @@
       <div class="celeb__big-heart" id="celebBigHeart" aria-hidden="true">💖</div>
       <h2 class="celeb__title" id="celebTitle">Yaaay 💕</h2>
       <p  class="celeb__msg"  id="celebMsg" >I knew you'd say yes!</p>
+      <button class="btn btn--gift" id="btnGift" type="button">Click here for a gift 🎁</button>
     </div>
     <p class="celeb__tap">Tap anywhere to spawn hearts ✨</p>
+  </section>
+
+  <!-- Gift Sequence Screen -->
+  <section class="gift-screen" id="giftScreen" aria-hidden="true">
+    <div class="gift-bg-animations" id="giftBgAnimations"></div>
+    <div class="gift-container" id="giftContainer">
+      <!-- Flower Bouquet -->
+      <img src="PNG/Flowerbouque.png" class="gift-item" id="bouquet" alt="Flower Bouquet" />
+      <button class="btn btn--next-gift" id="btnNextGift1" type="button">Next Gift 💝</button>
+      
+      <!-- Gift Box (clickable) -->
+      <img src="PNG/giftbox.png" class="gift-item" id="giftbox" alt="Gift Box" />
+      
+      <!-- Message Box (instruction for giftbox) -->
+      <div class="message-box" id="messageBox">
+        <p>Click on it! 👆</p>
+      </div>
+      
+      <!-- Envelope (clickable) -->
+      <img src="PNG/envelope.png" class="gift-item" id="envelope" alt="Envelope" />
+      
+      <!-- Envelope Message (instruction for envelope) -->
+      <div class="envelope-message" id="envelopeMessage">
+        <p>Open it! 💌</p>
+      </div>
+      
+      <!-- Final Message -->
+      <div class="final-message" id="finalMessage">
+        <h2>I LOVE YOU</h2>
+        <p>💕✨💖</p>
+      </div>
+    </div>
   </section>
 
   <script src="script.js"></script>

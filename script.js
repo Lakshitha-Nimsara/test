@@ -252,6 +252,242 @@
     }, 450);
   }
 
+  /* ─── 5a. Gift Button Click ─── */
+  const btnGift = document.getElementById('btnGift');
+  const giftScreen = document.getElementById('giftScreen');
+  const giftBgAnimations = document.getElementById('giftBgAnimations');
+  
+  btnGift.addEventListener('click', onGiftClick);
+  btnGift.addEventListener('touchstart', function(e) {
+    e.preventDefault();
+    onGiftClick(e);
+  }, { passive: false });
+  
+  function onGiftClick() {
+    /* Hide celebration screen */
+    celebScreen.style.transition = 'opacity .5s ease';
+    celebScreen.style.opacity = '0';
+    
+    setTimeout(function() {
+      celebScreen.classList.remove('visible');
+      celebScreen.setAttribute('aria-hidden', 'true');
+      
+      /* Show gift screen */
+      giftScreen.classList.add('visible');
+      giftScreen.removeAttribute('aria-hidden');
+      
+      /* Start background animations */
+      startGiftBackgroundAnimations();
+      
+      /* Show first gift (bouquet) */
+      setTimeout(function() {
+        showBouquet();
+      }, 300);
+    }, 500);
+  }
+  
+  /* ─── 5b. Gift Background Animations ─── */
+  function startGiftBackgroundAnimations() {
+    const colors = [
+      'rgba(255, 182, 193, 0.6)',  // light pink
+      'rgba(255, 105, 180, 0.5)',  // hot pink
+      'rgba(255, 192, 203, 0.6)',  // pink
+      'rgba(221, 160, 221, 0.5)',  // plum
+      'rgba(238, 130, 238, 0.5)'   // violet
+    ];
+    
+    setInterval(function() {
+      const particle = document.createElement('div');
+      particle.className = 'gift-particle';
+      
+      const size = 6 + Math.random() * 12;
+      const color = colors[Math.floor(Math.random() * colors.length)];
+      const startX = Math.random() * 100;
+      const startY = Math.random() * 100;
+      const tx = (Math.random() - 0.5) * 200;
+      const ty = -50 - Math.random() * 100;
+      const duration = 3 + Math.random() * 4;
+      
+      particle.style.width = size + 'px';
+      particle.style.height = size + 'px';
+      particle.style.background = color;
+      particle.style.left = startX + '%';
+      particle.style.top = startY + '%';
+      particle.style.setProperty('--tx', tx + 'px');
+      particle.style.setProperty('--ty', ty + 'px');
+      particle.style.animationDuration = duration + 's';
+      
+      giftBgAnimations.appendChild(particle);
+      
+      setTimeout(function() {
+        if (particle.parentNode) {
+          particle.parentNode.removeChild(particle);
+        }
+      }, duration * 1000);
+    }, 200);
+  }
+  
+  /* ─── 5c. Bouquet Sequence ─── */
+  const bouquet = document.getElementById('bouquet');
+  const btnNextGift1 = document.getElementById('btnNextGift1');
+  
+  function showBouquet() {
+    bouquet.classList.add('show');
+    
+    /* Show next button after bouquet fully appears */
+    setTimeout(function() {
+      btnNextGift1.classList.add('show');
+    }, 1200);
+  }
+  
+  btnNextGift1.addEventListener('click', onNextGift1Click);
+  btnNextGift1.addEventListener('touchstart', function(e) {
+    e.preventDefault();
+    onNextGift1Click(e);
+  }, { passive: false });
+  
+  function onNextGift1Click() {
+    /* Hide bouquet and button */
+    bouquet.style.transition = 'opacity .5s ease, transform .5s ease';
+    bouquet.style.opacity = '0';
+    bouquet.style.transform = 'scale(0.8)';
+    btnNextGift1.style.opacity = '0';
+    
+    setTimeout(function() {
+      bouquet.classList.remove('show');
+      btnNextGift1.classList.remove('show');
+      bouquet.style.opacity = '';
+      bouquet.style.transform = '';
+      btnNextGift1.style.opacity = '';
+      
+      /* Show gift box */
+      showGiftBox();
+    }, 500);
+  }
+  
+  /* ─── 5d. Gift Box Sequence ─── */
+  const giftbox = document.getElementById('giftbox');
+  const btnNextGift2 = document.getElementById('btnNextGift2');
+  
+  function showGiftBox() {
+    giftbox.classList.add('show', 'clickable');
+    
+    /* Show message box after gift box fully appears */
+    setTimeout(function() {
+      showMessageBox();
+    }, 1200);
+  }
+  
+  /* Remove the Next Gift 2 button event listeners - not needed anymore */
+  
+  /* ─── 5e. Message Box (instruction only) ─── */
+  const messageBox = document.getElementById('messageBox');
+  
+  function showMessageBox() {
+    messageBox.classList.add('show');
+  }
+  
+  /* Click handler is now on the giftbox itself */
+  giftbox.addEventListener('click', onGiftBoxClick);
+  giftbox.addEventListener('touchstart', function(e) {
+    e.preventDefault();
+    onGiftBoxClick(e);
+  }, { passive: false });
+  
+  function onGiftBoxClick() {
+    /* Only respond if giftbox is visible and clickable */
+    if (!giftbox.classList.contains('clickable')) return;
+    
+    /* Remove clickable to prevent multiple clicks */
+    giftbox.classList.remove('clickable');
+    
+    /* Jiggle the giftbox */
+    giftbox.classList.add('jiggle');
+    
+    setTimeout(function() {
+      giftbox.classList.remove('jiggle');
+      giftbox.classList.add('vanish');
+      
+      /* Hide message box */
+      messageBox.classList.add('vanish');
+      
+      /* Create pink mist effect at giftbox location */
+      const mist = document.createElement('div');
+      mist.className = 'pink-mist';
+      const rect = giftbox.getBoundingClientRect();
+      const giftScreenRect = giftScreen.getBoundingClientRect();
+      mist.style.left = (rect.left - giftScreenRect.left + rect.width / 2 - 100) + 'px';
+      mist.style.top = (rect.top - giftScreenRect.top + rect.height / 2 - 100) + 'px';
+      document.getElementById('giftContainer').appendChild(mist);
+      
+      setTimeout(function() {
+        if (mist.parentNode) {
+          mist.parentNode.removeChild(mist);
+        }
+      }, 1000);
+      
+      /* Show envelope after mist */
+      setTimeout(function() {
+        giftbox.classList.remove('show', 'vanish', 'clickable');
+        messageBox.classList.remove('show', 'vanish');
+        showEnvelope();
+      }, 800);
+    }, 500);
+  }
+  
+  /* ─── 5f. Envelope Sequence ─── */
+  const envelope = document.getElementById('envelope');
+  const envelopeMessage = document.getElementById('envelopeMessage');
+  
+  function showEnvelope() {
+    envelope.classList.add('show', 'clickable');
+    
+    /* Show envelope message after envelope fully appears */
+    setTimeout(function() {
+      envelopeMessage.classList.add('show');
+    }, 1200);
+  }
+  
+  envelope.addEventListener('click', onEnvelopeClick);
+  envelope.addEventListener('touchstart', function(e) {
+    e.preventDefault();
+    onEnvelopeClick(e);
+  }, { passive: false });
+  
+  function onEnvelopeClick() {
+    /* Only respond if envelope is visible and clickable */
+    if (!envelope.classList.contains('clickable')) return;
+    
+    /* Remove clickable to prevent multiple clicks */
+    envelope.classList.remove('clickable');
+    
+    /* Jiggle animation */
+    envelope.classList.add('jiggle');
+    
+    /* Hide envelope message */
+    envelopeMessage.classList.add('vanish');
+    
+    setTimeout(function() {
+      envelope.classList.remove('jiggle');
+      envelope.classList.add('vanish');
+      
+      setTimeout(function() {
+        envelope.classList.remove('show', 'vanish', 'clickable');
+        envelopeMessage.classList.remove('show', 'vanish');
+        
+        /* Show final message */
+        showFinalMessage();
+      }, 600);
+    }, 500);
+  }
+  
+  /* ─── 5g. Final Message ─── */
+  const finalMessage = document.getElementById('finalMessage');
+  
+  function showFinalMessage() {
+    finalMessage.classList.add('show');
+  }
+
   /* ─── 6. Celebration heart rain (continuous) ─── */
   function startCelebHeartRain() {
     let running = true;
