@@ -29,15 +29,15 @@
     'SADCAT/sadcat7.gif'
   ];
   
-  /* Text messages for each GIF (sadcat7 has its own specific message) */
+  /* Text messages for each GIF */
   const SADCAT_TEXTS = [
-    'Ane baba 🥺',
-    'Please say yes',
-    'bbyyyyyy🥹',
-    'Yes ඔබන්න 😪',
-    'මං තරහයි 🥺',
-    'Ane baba 🥺',
-    'Yes obapan babaaa 😠'  // Specific message for sadcat7.gif
+    'මොකක්? 😳',           // sadcat1.gif
+    'දුකයි ඈ 😓',          // sadcat2.gif
+    'ඇයි ඔයා මේම 🥺',      // sadcat3.gif
+    'අනේ Yes කියන්නකෝ 😫', // sadcat4.gif
+    'මං තරහයි අනේ 🥺',    // sadcat5.gif
+    'අනේ Please',         // sadcat6.gif
+    'Yes Obapan බබා 😠'   // sadcat7.gif
   ];
 
   /* ─── Preload GIFs and images in background ─── */

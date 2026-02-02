@@ -1082,7 +1082,7 @@ body {
   /* Bouquet message on mobile - positioned at top of bouquet, slightly right */
   .bouquet-message {
     left: auto;
-    right: 5px;
+    right: 20px;
     top: -125px;
     bottom: auto;
     transform: scale(0.5);
