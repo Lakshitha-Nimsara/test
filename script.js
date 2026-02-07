@@ -16,6 +16,7 @@
   const sadcatPortal = document.getElementById('sadcatPortal');
   const celebScreen  = document.getElementById('celebScreen');
   const celebHearts  = document.getElementById('celebHearts');
+  const giftScreen   = document.getElementById('giftScreen');
 
   /* ─── Config ─── */
   const HEART_EMOJIS  = ['💖','💗','💓','💞','💝','🌹','✨'];
@@ -31,14 +32,18 @@
   
   /* Text messages for each GIF */
   const SADCAT_TEXTS = [
-    'මොකක්? 😳',           // sadcat1.gif
-    'දුකයි ඈ 😓',          // sadcat2.gif
-    'ඇයි ඔයා මේම 🥺',      // sadcat3.gif
-    'අනේ Yes කියන්නකෝ 😫', // sadcat4.gif
-    'මං තරහයි අනේ 🥺',    // sadcat5.gif
-    'අනේ Please',         // sadcat6.gif
-    'Yes Obapan බබා 😠'   // sadcat7.gif
+    'Mokaak? 😳',              // sadcat1.gif
+    'Dukai ඈ 😓',              // sadcat2.gif
+    'Ae oya meema 🥺',         // sadcat3.gif
+    'Ane Yes කියන්නකෝ 😫',    // sadcat4.gif
+    'මං තරහයි අනේ 🥺',        // sadcat5.gif
+    'Please please',           // sadcat6.gif
+    'Yes Obapan Babaaa😠'      // sadcat7.gif
   ];
+
+  /* Sadcat history tracking to prevent repeats */
+  let sadcatHistory = [];
+  const MAX_HISTORY = 3; // Remember last 3 gifs shown
 
   /* ─── Preload GIFs and images in background ─── */
   (function preloadAssets() {
@@ -62,6 +67,12 @@
     
     const giftboxImg = new Image();
     giftboxImg.src = 'PNG/giftbox.png';
+    
+    const choco1Img = new Image();
+    choco1Img.src = 'PNG/choco1.png';
+    
+    const choco2Img = new Image();
+    choco2Img.src = 'PNG/choco2.png';
     
     const envelopeImg = new Image();
     envelopeImg.src = 'PNG/envelope.png';
@@ -173,8 +184,40 @@
     btnNo.style.top  = y + 'px';
   }
 
-  /* ─── 4. Sad Cat GIF ─── */
+  /* ─── 4. Sad Cat GIF with improved randomization ─── */
   var sadcatFadeTimer = null;   // holds the pending fadeout timeout
+
+  function getRandomSadcatIndex() {
+    // Create array of available indices (0 to 6)
+    let availableIndices = [];
+    for (let i = 0; i < SADCAT_GIFS.length; i++) {
+      availableIndices.push(i);
+    }
+    
+    // Remove indices that are in history (recent gifs)
+    availableIndices = availableIndices.filter(function(index) {
+      return sadcatHistory.indexOf(index) === -1;
+    });
+    
+    // If all indices are in history (shouldn't happen with MAX_HISTORY < total gifs),
+    // just use the oldest one from history
+    if (availableIndices.length === 0) {
+      availableIndices = [0, 1, 2, 3, 4, 5, 6];
+    }
+    
+    // Pick random index from available ones
+    const randomIndex = availableIndices[Math.floor(Math.random() * availableIndices.length)];
+    
+    // Add to history
+    sadcatHistory.push(randomIndex);
+    
+    // Keep history at max size
+    if (sadcatHistory.length > MAX_HISTORY) {
+      sadcatHistory.shift(); // Remove oldest
+    }
+    
+    return randomIndex;
+  }
 
   function showSadCat() {
     /* Kill any previous fadeout timer immediately - ensures fresh 4 second timer */
@@ -186,8 +229,8 @@
     /* Hide instantly so we can swap the image cleanly */
     sadcatPortal.classList.remove('visible');
 
-    /* Pick random gif and its corresponding text */
-    var randomIndex = Math.floor(Math.random() * SADCAT_GIFS.length);
+    /* Pick random gif using improved algorithm */
+    var randomIndex = getRandomSadcatIndex();
     var gif = SADCAT_GIFS[randomIndex];
     var text = SADCAT_TEXTS[randomIndex];
 
@@ -210,52 +253,33 @@
     var oldText = sadcatPortal.querySelector('.sadcat-text');
     if (oldText) oldText.remove();
 
-    /* Create a brand new img — browser ALWAYS loads a new element */
-    var newImg = document.createElement('img');
-    newImg.className = 'sadcat-portal__img';
-    newImg.alt       = 'sad cat';
-    
-    /* Create text element */
-    var textEl = document.createElement('div');
-    textEl.className = 'sadcat-text';
-    textEl.textContent = text;
+    /* Insert fresh elements using cached images */
+    var img = document.createElement('img');
+    img.className = 'sadcat-portal__img';
+    img.src = gif;
+    img.alt = 'Sad cat';
 
-    /* Function to start the 4-second timer for THIS specific gif */
-    function startFadeTimer() {
-      /* Clear any existing timer first */
-      if (sadcatFadeTimer !== null) {
-        clearTimeout(sadcatFadeTimer);
-      }
-      
-      /* Start fresh 4-second timer for this gif */
-      sadcatFadeTimer = setTimeout(function () {
-        sadcatPortal.classList.remove('visible');
-        sadcatFadeTimer = null;
-      }, 4000);
-    }
+    /* Text element */
+    var textElement = document.createElement('div');
+    textElement.className = 'sadcat-text';
+    textElement.textContent = text;
 
-    /* Only fade in once the image is actually loaded */
-    newImg.onload = function () {
+    sadcatPortal.appendChild(img);
+    sadcatPortal.appendChild(textElement);
+
+    /* Reveal after a tiny delay for smoother transition */
+    setTimeout(function () {
       sadcatPortal.classList.add('visible');
-      /* Start fresh 4-second timer */
-      startFadeTimer();
-    };
+    }, 30);
 
-    /* If load fails for any reason, still show and start timer */
-    newImg.onerror = function () {
-      sadcatPortal.classList.add('visible');
-      /* Start fresh 4-second timer */
-      startFadeTimer();
-    };
-
-    sadcatPortal.appendChild(newImg);
-    sadcatPortal.appendChild(textEl);
-
-    /* Set src AFTER appending and attaching handlers */
-    newImg.src = gif;
+    /* Auto-hide after 4 seconds */
+    sadcatFadeTimer = setTimeout(function () {
+      sadcatPortal.classList.remove('visible');
+      sadcatFadeTimer = null;
+    }, 4000);
   }
 
-  /* ─── 5. YES Button — celebration ─── */
+  /* ─── 5. YES Button — Celebration Screen ─── */
   btnYes.addEventListener('click', onYesClick);
   btnYes.addEventListener('touchstart', function (e) {
     e.preventDefault();
@@ -263,207 +287,162 @@
   }, { passive: false });
 
   function onYesClick() {
-    /* Smoothly hide the card */
-    mainCard.style.transition = 'opacity .4s ease, transform .4s cubic-bezier(.55,.055,.675,1.19)';
-    mainCard.style.opacity    = '0';
-    mainCard.style.transform  = 'scale(.85)';
-
-    setTimeout(function () {
+    // Immediately hide main card and sad cat portal
+    mainCard.style.transition = 'opacity 0.4s ease';
+    mainCard.style.opacity = '0';
+    mainCard.style.pointerEvents = 'none';
+    
+    sadcatPortal.classList.remove('visible');
+    sadcatPortal.style.display = 'none';
+    
+    // Show celebration screen after brief delay
+    setTimeout(function() {
       mainCard.style.display = 'none';
-
-      /* Show celebration screen */
       celebScreen.classList.add('visible');
-      celebScreen.removeAttribute('aria-hidden');
-
-      /* Start celebration heart rain */
       startCelebHeartRain();
-      
-      /* Start glowing hearts behind dance gif */
       startGlowHearts();
-
-      /* Bind tap-to-spawn */
-      celebScreen.addEventListener('click',  spawnTapHeart);
-      celebScreen.addEventListener('touchstart', function (e) {
-        e.preventDefault();
-        spawnTapHeart(e.touches ? e.touches[0] : e);
-      }, { passive: false });
-    }, 450);
+      
+      // Enable tap-to-spawn hearts
+      celebScreen.addEventListener('click', spawnTapHeart);
+      celebScreen.addEventListener('touchstart', function(e) {
+        // Don't spawn hearts if clicking the gift button
+        if (e.target.id !== 'btnGift') {
+          spawnTapHeart(e.touches[0]);
+        }
+      });
+    }, 400);
   }
 
-  /* ─── 5a. Gift Button Click ─── */
+  /* ─── 5a. Gift Button Click Handler ─── */
   const btnGift = document.getElementById('btnGift');
-  const giftScreen = document.getElementById('giftScreen');
-  const giftBgAnimations = document.getElementById('giftBgAnimations');
-  
   btnGift.addEventListener('click', onGiftClick);
   btnGift.addEventListener('touchstart', function(e) {
     e.preventDefault();
     onGiftClick(e);
   }, { passive: false });
-  
+
   function onGiftClick() {
-    /* Hide celebration screen */
-    celebScreen.style.transition = 'opacity .5s ease';
-    celebScreen.style.opacity = '0';
+    // Hide celebration screen
+    celebScreen.classList.remove('visible');
     
     setTimeout(function() {
-      celebScreen.classList.remove('visible');
-      celebScreen.setAttribute('aria-hidden', 'true');
+      celebScreen.style.display = 'none';
       
-      /* Show gift screen */
+      // Show gift screen and start with bouquet
       giftScreen.classList.add('visible');
-      giftScreen.removeAttribute('aria-hidden');
-      
-      /* Start background animations */
-      startGiftBackgroundAnimations();
-      
-      /* Show first gift (bouquet) */
-      setTimeout(function() {
-        showBouquet();
-      }, 300);
-    }, 500);
+      initGiftScreenBackground();
+      showBouquet();
+    }, 600);
   }
-  
-  /* ─── 5b. Gift Background Animations ─── */
-  function startGiftBackgroundAnimations() {
-    const colors = [
-      'rgba(255, 182, 193, 0.6)',  // light pink
-      'rgba(255, 105, 180, 0.5)',  // hot pink
-      'rgba(255, 192, 203, 0.6)',  // pink
-      'rgba(221, 160, 221, 0.5)',  // plum
-      'rgba(238, 130, 238, 0.5)'   // violet
-    ];
+
+  /* ─── 5b. Gift Screen Background Particles ─── */
+  function initGiftScreenBackground() {
+    const bgAnimations = document.getElementById('giftBgAnimations');
+    const colors = ['#fce4ec', '#f8bbd0', '#f48fb1', '#e8eaf6'];
     
-    setInterval(function() {
+    // Create only 6 small particles to avoid lag
+    for (let i = 0; i < 6; i++) {
       const particle = document.createElement('div');
       particle.className = 'gift-particle';
+      particle.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+      particle.style.left = Math.random() * 100 + '%';
+      particle.style.top = Math.random() * 100 + '%';
+      particle.style.setProperty('--tx', (Math.random() - 0.5) * 100 + 'px');
+      particle.style.setProperty('--ty', -(Math.random() * 150 + 50) + 'px');
+      particle.style.animationDuration = (4 + Math.random() * 3) + 's';
+      particle.style.animationDelay = Math.random() * 2 + 's';
       
-      const size = 6 + Math.random() * 12;
-      const color = colors[Math.floor(Math.random() * colors.length)];
-      const startX = Math.random() * 100;
-      const startY = Math.random() * 100;
-      const tx = (Math.random() - 0.5) * 200;
-      const ty = -50 - Math.random() * 100;
-      const duration = 3 + Math.random() * 4;
-      
-      particle.style.width = size + 'px';
-      particle.style.height = size + 'px';
-      particle.style.background = color;
-      particle.style.left = startX + '%';
-      particle.style.top = startY + '%';
-      particle.style.setProperty('--tx', tx + 'px');
-      particle.style.setProperty('--ty', ty + 'px');
-      particle.style.animationDuration = duration + 's';
-      
-      giftBgAnimations.appendChild(particle);
-      
-      setTimeout(function() {
-        if (particle.parentNode) {
-          particle.parentNode.removeChild(particle);
-        }
-      }, duration * 1000);
-    }, 200);
+      bgAnimations.appendChild(particle);
+    }
   }
-  
+
   /* ─── 5c. Bouquet Sequence ─── */
   const bouquet = document.getElementById('bouquet');
   const bouquetMessage = document.getElementById('bouquetMessage');
   const btnNextGift1 = document.getElementById('btnNextGift1');
-  
+
   function showBouquet() {
     bouquet.classList.add('show');
     
-    /* Show bouquet message after bouquet appears */
     setTimeout(function() {
       bouquetMessage.classList.add('show');
     }, 800);
     
-    /* Show next button after bouquet fully appears */
     setTimeout(function() {
       btnNextGift1.classList.add('show');
-    }, 1200);
+    }, 1500);
   }
-  
+
   btnNextGift1.addEventListener('click', onNextGift1Click);
   btnNextGift1.addEventListener('touchstart', function(e) {
     e.preventDefault();
     onNextGift1Click(e);
   }, { passive: false });
-  
+
   function onNextGift1Click() {
-    /* Hide bouquet, message and button */
-    bouquet.style.transition = 'opacity .5s ease, transform .5s ease';
-    bouquet.style.opacity = '0';
-    bouquet.style.transform = 'scale(0.8)';
+    if (!btnNextGift1.classList.contains('show')) return;
+    
+    // Smoothly fade out button
+    btnNextGift1.style.transition = 'opacity 0.3s ease, transform 0.3s ease';
     btnNextGift1.style.opacity = '0';
-    bouquetMessage.classList.add('vanish');
+    btnNextGift1.style.transform = 'scale(0.8)';
     
     setTimeout(function() {
-      bouquet.classList.remove('show');
       btnNextGift1.classList.remove('show');
-      bouquetMessage.classList.remove('show', 'vanish');
-      bouquet.style.opacity = '';
-      bouquet.style.transform = '';
       btnNextGift1.style.opacity = '';
+      btnNextGift1.style.transform = '';
       
-      /* Show gift box */
-      showGiftBox();
-    }, 500);
+      // Hide bouquet and message
+      bouquet.classList.add('vanish');
+      bouquetMessage.classList.add('vanish');
+      
+      setTimeout(function() {
+        bouquet.classList.remove('show', 'vanish');
+        bouquetMessage.classList.remove('show', 'vanish');
+        
+        // Show giftbox
+        showGiftbox();
+      }, 600);
+    }, 300);
   }
-  
-  /* ─── 5d. Gift Box Sequence ─── */
+
+  /* ─── 5d. Giftbox Sequence ─── */
   const giftbox = document.getElementById('giftbox');
-  const btnNextGift2 = document.getElementById('btnNextGift2');
-  let giftboxReady = false;  // Flag to prevent clicking before fully loaded
-  
-  function showGiftBox() {
+  const messageBox = document.getElementById('messageBox');
+  let giftboxReady = false;
+
+  function showGiftbox() {
     giftbox.classList.add('show');
-    giftboxReady = false;  // Block clicks initially
+    giftboxReady = false;
     
-    /* Make clickable only after gift box fully appears */
     setTimeout(function() {
       giftbox.classList.add('clickable');
-      giftboxReady = true;  // Now allow clicks
-      showMessageBox();
+      giftboxReady = true;
+      messageBox.classList.add('show');
     }, 1200);
   }
-  
-  /* Remove the Next Gift 2 button event listeners - not needed anymore */
-  
-  /* ─── 5e. Message Box (instruction only) ─── */
-  const messageBox = document.getElementById('messageBox');
-  
-  function showMessageBox() {
-    messageBox.classList.add('show');
-  }
-  
-  /* Click handler is now on the giftbox itself */
-  giftbox.addEventListener('click', onGiftBoxClick);
+
+  giftbox.addEventListener('click', onGiftboxClick);
   giftbox.addEventListener('touchstart', function(e) {
     e.preventDefault();
-    onGiftBoxClick(e);
+    onGiftboxClick(e);
   }, { passive: false });
-  
-  function onGiftBoxClick() {
-    /* Only respond if giftbox is visible, clickable, AND ready */
+
+  function onGiftboxClick() {
     if (!giftbox.classList.contains('clickable') || !giftboxReady) return;
     
-    /* Remove clickable to prevent multiple clicks */
     giftbox.classList.remove('clickable');
-    giftboxReady = false;  // Disable further clicks
+    giftboxReady = false;
     
-    /* Block all interactions on gift screen during transition */
+    // Disable all interactions during animation
     giftScreen.style.pointerEvents = 'none';
     
-    /* Jiggle the giftbox */
     giftbox.classList.add('jiggle');
+    messageBox.classList.add('vanish');
     
     setTimeout(function() {
       giftbox.classList.remove('jiggle');
       giftbox.classList.add('vanish');
-      
-      /* Hide message box */
-      messageBox.classList.add('vanish');
       
       /* Create pink mist effect at giftbox location */
       const mist = document.createElement('div');
@@ -480,54 +459,171 @@
         }
       }, 1000);
       
-      /* Show envelope after mist */
+      /* Show choco1 after mist */
       setTimeout(function() {
         giftbox.classList.remove('show', 'vanish', 'clickable');
         messageBox.classList.remove('show', 'vanish');
-        giftScreen.style.pointerEvents = 'auto';  // Re-enable interactions
+        giftScreen.style.pointerEvents = 'auto';
+        showChoco1();
+      }, 800);
+    }, 500);
+  }
+
+  /* ─── 5e. Choco1 Sequence ─── */
+  const choco1 = document.getElementById('choco1');
+  const choco1Message = document.getElementById('choco1Message');
+  let choco1Ready = false;
+
+  function showChoco1() {
+    choco1.classList.add('show');
+    choco1Ready = false;
+    
+    setTimeout(function() {
+      choco1.classList.add('clickable');
+      choco1Ready = true;
+      choco1Message.classList.add('show');
+    }, 1200);
+  }
+
+  choco1.addEventListener('click', onChoco1Click);
+  choco1.addEventListener('touchstart', function(e) {
+    e.preventDefault();
+    onChoco1Click(e);
+  }, { passive: false });
+
+  function onChoco1Click() {
+    if (!choco1.classList.contains('clickable') || !choco1Ready) return;
+    
+    choco1.classList.remove('clickable');
+    choco1Ready = false;
+    
+    giftScreen.style.pointerEvents = 'none';
+    
+    choco1.classList.add('jiggle');
+    choco1Message.classList.add('vanish');
+    
+    setTimeout(function() {
+      choco1.classList.remove('jiggle');
+      choco1.classList.add('vanish');
+      
+      /* Create pink mist effect at choco1 location */
+      const mist = document.createElement('div');
+      mist.className = 'pink-mist';
+      const rect = choco1.getBoundingClientRect();
+      const giftScreenRect = giftScreen.getBoundingClientRect();
+      mist.style.left = (rect.left - giftScreenRect.left + rect.width / 2 - 100) + 'px';
+      mist.style.top = (rect.top - giftScreenRect.top + rect.height / 2 - 100) + 'px';
+      document.getElementById('giftContainer').appendChild(mist);
+      
+      setTimeout(function() {
+        if (mist.parentNode) {
+          mist.parentNode.removeChild(mist);
+        }
+      }, 1000);
+      
+      /* Show choco2 after mist */
+      setTimeout(function() {
+        choco1.classList.remove('show', 'vanish', 'clickable');
+        choco1Message.classList.remove('show', 'vanish');
+        giftScreen.style.pointerEvents = 'auto';
+        showChoco2();
+      }, 800);
+    }, 500);
+  }
+
+  /* ─── 5f. Choco2 Sequence ─── */
+  const choco2 = document.getElementById('choco2');
+  const choco2Message = document.getElementById('choco2Message');
+  let choco2Ready = false;
+
+  function showChoco2() {
+    choco2.classList.add('show');
+    choco2Ready = false;
+    
+    setTimeout(function() {
+      choco2.classList.add('clickable');
+      choco2Ready = true;
+      choco2Message.classList.add('show');
+    }, 1200);
+  }
+
+  choco2.addEventListener('click', onChoco2Click);
+  choco2.addEventListener('touchstart', function(e) {
+    e.preventDefault();
+    onChoco2Click(e);
+  }, { passive: false });
+
+  function onChoco2Click() {
+    if (!choco2.classList.contains('clickable') || !choco2Ready) return;
+    
+    choco2.classList.remove('clickable');
+    choco2Ready = false;
+    
+    giftScreen.style.pointerEvents = 'none';
+    
+    choco2.classList.add('jiggle');
+    choco2Message.classList.add('vanish');
+    
+    setTimeout(function() {
+      choco2.classList.remove('jiggle');
+      choco2.classList.add('vanish');
+      
+      /* Create pink mist effect at choco2 location */
+      const mist = document.createElement('div');
+      mist.className = 'pink-mist';
+      const rect = choco2.getBoundingClientRect();
+      const giftScreenRect = giftScreen.getBoundingClientRect();
+      mist.style.left = (rect.left - giftScreenRect.left + rect.width / 2 - 100) + 'px';
+      mist.style.top = (rect.top - giftScreenRect.top + rect.height / 2 - 100) + 'px';
+      document.getElementById('giftContainer').appendChild(mist);
+      
+      setTimeout(function() {
+        if (mist.parentNode) {
+          mist.parentNode.removeChild(mist);
+        }
+      }, 1000);
+      
+      /* Show envelope after mist */
+      setTimeout(function() {
+        choco2.classList.remove('show', 'vanish', 'clickable');
+        choco2Message.classList.remove('show', 'vanish');
+        giftScreen.style.pointerEvents = 'auto';
         showEnvelope();
       }, 800);
     }, 500);
   }
-  
-  /* ─── 5f. Envelope Sequence ─── */
+
+  /* ─── 5g. Envelope Sequence ─── */
   const envelope = document.getElementById('envelope');
   const envelopeMessage = document.getElementById('envelopeMessage');
-  let envelopeReady = false;  // Flag to prevent clicking before fully loaded
-  
+  let envelopeReady = false;
+
   function showEnvelope() {
     envelope.classList.add('show');
-    envelopeReady = false;  // Block clicks initially
+    envelopeReady = false;
     
-    /* Make clickable only after envelope fully appears */
     setTimeout(function() {
       envelope.classList.add('clickable');
-      envelopeReady = true;  // Now allow clicks
+      envelopeReady = true;
       envelopeMessage.classList.add('show');
     }, 1200);
   }
-  
+
   envelope.addEventListener('click', onEnvelopeClick);
   envelope.addEventListener('touchstart', function(e) {
     e.preventDefault();
     onEnvelopeClick(e);
   }, { passive: false });
-  
+
   function onEnvelopeClick() {
-    /* Only respond if envelope is visible, clickable, AND ready */
     if (!envelope.classList.contains('clickable') || !envelopeReady) return;
     
-    /* Remove clickable to prevent multiple clicks */
     envelope.classList.remove('clickable');
-    envelopeReady = false;  // Disable further clicks
+    envelopeReady = false;
     
-    /* Block all interactions on gift screen during transition */
     giftScreen.style.pointerEvents = 'none';
     
-    /* Jiggle animation */
     envelope.classList.add('jiggle');
-    
-    /* Hide envelope message */
     envelopeMessage.classList.add('vanish');
     
     setTimeout(function() {
@@ -537,45 +633,39 @@
       setTimeout(function() {
         envelope.classList.remove('show', 'vanish', 'clickable');
         envelopeMessage.classList.remove('show', 'vanish');
-        giftScreen.style.pointerEvents = 'auto';  // Re-enable interactions
+        giftScreen.style.pointerEvents = 'auto';
         
-        /* Show final message */
         showFinalMessage();
       }, 600);
     }, 500);
   }
-  
-  /* ─── 5g. Final Message with Typewriter Effect ─── */
+
+  /* ─── 5h. Final Message with Typewriter Effect ─── */
   const finalMessage = document.getElementById('finalMessage');
   const loveText = document.getElementById('loveText');
-  
+
   function showFinalMessage() {
     finalMessage.classList.add('show');
     
-    /* Start typewriter effect after note appears */
     setTimeout(function() {
       typewriterEffect();
     }, 800);
   }
-  
+
   function typewriterEffect() {
     const text = "මං ඔයාට ගොදාආආආආආආආක්\nආදලෙයි 😚❤️\n\nඋම්ම්ම්ම්ම්ම්ම්ම්ම්ම්ම්ම්ම්ම්ම්ම්ම්මා ❤️";
     let index = 0;
     
-    /* Add typing class to show cursor */
     loveText.classList.add('typing');
     
-    /* Typewriter interval */
     const typingInterval = setInterval(function() {
       if (index < text.length) {
         loveText.textContent += text.charAt(index);
         index++;
       } else {
-        /* Typing complete */
         clearInterval(typingInterval);
         loveText.classList.remove('typing');
         
-        /* Show signature after typing is complete */
         setTimeout(function() {
           const signature = document.querySelector('.signature');
           if (signature) {
@@ -583,7 +673,7 @@
           }
         }, 500);
       }
-    }, 80); /* Speed: 80ms per character - adjust for faster/slower typing */
+    }, 80);
   }
 
   /* ─── 6. Celebration heart rain (continuous) ─── */
@@ -598,7 +688,7 @@
       h.textContent = HEART_EMOJIS[Math.floor(Math.random() * HEART_EMOJIS.length)];
 
       const leftPct  = Math.random() * 95;
-      const duration = 2.5 + Math.random() * 3.5;  // 2.5-6 s
+      const duration = 2.5 + Math.random() * 3.5;
 
       h.style.left              = leftPct + '%';
       h.style.fontSize          = (1.2 + Math.random() * 1.4) + 'rem';
@@ -606,12 +696,10 @@
 
       celebHearts.appendChild(h);
 
-      /* Remove node after animation ends */
       h.addEventListener('animationend', function () {
         if (h.parentNode) h.parentNode.removeChild(h);
       });
 
-      /* Schedule next heart */
       setTimeout(rain, 300 + Math.random() * 400);
     })();
   }
@@ -622,14 +710,13 @@
     const x = (e.clientX || e.pageX) - rect.left;
     const y = (e.clientY || e.pageY) - rect.top;
 
-    const count = 1;  // Only 1 heart per tap
+    const count = 1;
 
     for (let i = 0; i < count; i++) {
       const h = document.createElement('div');
       h.className   = 'tap-heart';
       h.textContent = HEART_EMOJIS[Math.floor(Math.random() * HEART_EMOJIS.length)];
 
-      /* Slight spread */
       const sx = x + (Math.random() - .5) * 20;
       const sy = y + (Math.random() - .5) * 20;
 
@@ -653,50 +740,44 @@
     const glowHeartEmojis = ['💖', '💗', '💓', '💞', '💝'];
     
     let running = true;
-    let activeHearts = 0;  // Track number of active hearts
-    const MAX_HEARTS = 5;  // Maximum hearts at once
+    let activeHearts = 0;
+    const MAX_HEARTS = 5;
 
     (function spawnGlowHeart() {
       if (!running) return;
 
-      // Only spawn if we haven't reached the maximum
       if (activeHearts < MAX_HEARTS) {
         const h = document.createElement('div');
         h.className = 'glow-heart';
         h.textContent = glowHeartEmojis[Math.floor(Math.random() * glowHeartEmojis.length)];
 
-        // Get the container size
         const containerWidth = celebDanceContainer.offsetWidth;
         const containerHeight = celebDanceContainer.offsetHeight;
         
-        // Position within the container (center is at containerWidth/2, containerHeight/2)
         const centerX = containerWidth / 2;
         const centerY = containerHeight / 2;
         
-        // Random offset from center (create a circle around the gif)
         const angle = Math.random() * Math.PI * 2;
-        const distance = 30 + Math.random() * 50; // 30-80px from center (adjusted for container)
+        const distance = 30 + Math.random() * 50;
         const x = centerX + Math.cos(angle) * distance;
         const y = centerY + Math.sin(angle) * distance;
 
         h.style.left = x + 'px';
         h.style.top = y + 'px';
         h.style.fontSize = (1.2 + Math.random() * 1) + 'rem';
-        h.style.animationDuration = (3 + Math.random() * 1) + 's';  // 3-4s duration
+        h.style.animationDuration = (3 + Math.random() * 1) + 's';
         h.style.animationDelay = (Math.random() * 0.3) + 's';
 
         celebGlowHearts.appendChild(h);
-        activeHearts++;  // Increment counter
+        activeHearts++;
 
-        /* Remove after animation and decrement counter */
         h.addEventListener('animationend', function() {
           if (h.parentNode) h.parentNode.removeChild(h);
-          activeHearts--;  // Decrement when removed
+          activeHearts--;
         });
       }
 
-      /* Spawn next glow heart - slower rate to prevent lag */
-      setTimeout(spawnGlowHeart, 600 + Math.random() * 800);  // 600-1400ms between spawns
+      setTimeout(spawnGlowHeart, 600 + Math.random() * 800);
     })();
   }
 

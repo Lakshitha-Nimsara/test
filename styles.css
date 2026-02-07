@@ -696,6 +696,39 @@ body {
   text-align: center;
 }
 
+/* Choco message - positioned similar to envelope message */
+.choco-message {
+  position: absolute;
+  right: -155px;
+  top: 50%;
+  transform: translateY(-50%) scale(0.5);
+  background: linear-gradient(135deg, var(--white) 0%, var(--cream) 100%);
+  border: 3px solid var(--rose-light);
+  border-radius: 20px;
+  padding: 18px 22px;
+  box-shadow: 0 12px 40px rgba(233, 30, 99, .25);
+  opacity: 0;
+  pointer-events: none;
+  transition: none;
+  white-space: nowrap;
+}
+
+.choco-message.show {
+  animation: envelopeMessageAppear .8s cubic-bezier(.34,1.56,.64,1) forwards;
+}
+
+.choco-message p {
+  font-size: 1.15rem;
+  font-weight: 600;
+  color: var(--rose);
+  margin: 0;
+  text-align: center;
+}
+
+.choco-message.vanish {
+  animation: messageVanish .6s ease forwards;
+}
+
 /* Bouquet message - positioned at right side top of bouquet */
 .bouquet-message {
   position: absolute;
@@ -1079,6 +1112,21 @@ body {
     animation: messageBoxAppearMobile .8s cubic-bezier(.34,1.56,.64,1) forwards;
   }
   
+  .choco-message {
+    left: 50%;
+    right: auto;
+    top: auto;
+    bottom: -160px;
+    transform: translateX(-50%) scale(0.5);
+    padding: 14px 18px;
+    max-width: 85vw;
+    white-space: normal;
+  }
+  
+  .choco-message.show {
+    animation: messageBoxAppearMobile .8s cubic-bezier(.34,1.56,.64,1) forwards;
+  }
+  
   /* Bouquet message on mobile - positioned at top of bouquet, slightly right */
   .bouquet-message {
     left: auto;
@@ -1097,6 +1145,7 @@ body {
   
   .message-box p,
   .envelope-message p,
+  .choco-message p,
   .bouquet-message p {
     font-size: 1rem;
   }
@@ -1190,7 +1239,8 @@ body {
   }
   
   .message-box,
-  .envelope-message {
+  .envelope-message,
+  .choco-message {
     bottom: -170px;
     padding: 12px 16px;
     max-width: 90vw;
@@ -1205,6 +1255,7 @@ body {
   
   .message-box p,
   .envelope-message p,
+  .choco-message p,
   .bouquet-message p {
     font-size: 0.92rem;
   }
@@ -1260,7 +1311,8 @@ body {
   }
   
   .message-box,
-  .envelope-message {
+  .envelope-message,
+  .choco-message {
     bottom: -120px;
     padding: 10px 14px;
   }
@@ -1274,6 +1326,7 @@ body {
   
   .message-box p,
   .envelope-message p,
+  .choco-message p,
   .bouquet-message p {
     font-size: 0.9rem;
   }
