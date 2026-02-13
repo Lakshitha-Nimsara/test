@@ -234,17 +234,48 @@
     var gif = SADCAT_GIFS[randomIndex];
     var text = SADCAT_TEXTS[randomIndex];
 
-    /* Position: roughly centered with slight random offset */
+    /* Position: roughly centered with slight random offset - avoiding YES button */
     var vw = window.innerWidth;
     var vh = window.innerHeight;
     var imgW = 120;
     var imgH = 120;
 
-    var offsetX = (Math.random() - .5) * (vw * .3);
-    var offsetY = (Math.random() - .5) * (vh * .25);
+    /* Get YES button position */
+    const yesRect = btnYes.getBoundingClientRect();
+    const yesX = yesRect.left;
+    const yesY = yesRect.top;
+    const yesW = btnYes.offsetWidth;
+    const yesH = btnYes.offsetHeight;
+    
+    var sadcatX, sadcatY;
+    var attempts = 0;
+    const maxAttempts = 50;
+    
+    /* Keep trying random positions until we find one that doesn't overlap YES button */
+    do {
+      var offsetX = (Math.random() - .5) * (vw * .3);
+      var offsetY = (Math.random() - .5) * (vh * .25);
+      
+      sadcatX = (vw / 2 - imgW / 2) + offsetX;
+      sadcatY = (vh / 2 - imgH / 2) + offsetY;
+      
+      attempts++;
+      
+      /* Check if sadcat GIF would overlap with YES button */
+      const noOverlap = !(
+        sadcatX < yesX + yesW + 20 &&  // +20 for extra spacing
+        sadcatX + imgW > yesX - 20 &&
+        sadcatY < yesY + yesH + 20 &&
+        sadcatY + imgH > yesY - 20
+      );
+      
+      if (noOverlap || attempts >= maxAttempts) {
+        break;
+      }
+    } while (true);
 
-    sadcatPortal.style.left = ((vw / 2 - imgW / 2) + offsetX) + 'px';
-    sadcatPortal.style.top  = ((vh / 2 - imgH / 2) + offsetY) + 'px';
+    sadcatPortal.style.left = sadcatX + 'px';
+    sadcatPortal.style.top  = sadcatY + 'px';
 
     /* Remove the old img and text entirely */
     var oldImg = sadcatPortal.querySelector('img');
@@ -416,10 +447,13 @@
     giftboxReady = false;
     
     setTimeout(function() {
+      messageBox.classList.add('show');
+    }, 800);
+    
+    setTimeout(function() {
       giftbox.classList.add('clickable');
       giftboxReady = true;
-      messageBox.classList.add('show');
-    }, 1200);
+    }, 1800);
   }
 
   giftbox.addEventListener('click', onGiftboxClick);
@@ -479,10 +513,13 @@
     choco1Ready = false;
     
     setTimeout(function() {
+      choco1Message.classList.add('show');
+    }, 800);
+    
+    setTimeout(function() {
       choco1.classList.add('clickable');
       choco1Ready = true;
-      choco1Message.classList.add('show');
-    }, 1200);
+    }, 1800);
   }
 
   choco1.addEventListener('click', onChoco1Click);
@@ -541,10 +578,13 @@
     choco2Ready = false;
     
     setTimeout(function() {
+      choco2Message.classList.add('show');
+    }, 800);
+    
+    setTimeout(function() {
       choco2.classList.add('clickable');
       choco2Ready = true;
-      choco2Message.classList.add('show');
-    }, 1200);
+    }, 1800);
   }
 
   choco2.addEventListener('click', onChoco2Click);
@@ -603,10 +643,13 @@
     envelopeReady = false;
     
     setTimeout(function() {
+      envelopeMessage.classList.add('show');
+    }, 800);
+    
+    setTimeout(function() {
       envelope.classList.add('clickable');
       envelopeReady = true;
-      envelopeMessage.classList.add('show');
-    }, 1200);
+    }, 1800);
   }
 
   envelope.addEventListener('click', onEnvelopeClick);
